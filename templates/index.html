@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SupportBot - Customer Support Assistant</title>
+
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light/Dark Theme */
+        :root {
+            --background-color-light: #f9f9f9;
+            --background-color-dark: #2c2c2c;
+            --text-color-light: #333;
+            --text-color-dark: #fff;
+            --primary-color: #007bff;
+            --secondary-color: #0056b3;
+            --bot-message-bg: #e6f7ff;
+            --user-message-bg: #007bff;
+            --background-color: var(--background-color-light);
+            --text-color: var(--text-color-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: var(--background-color-dark);
+                --text-color: var(--text-color-dark);
+            }
+        }
+
+        /* Chat Container */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 600px;
+            height: 90vh;
+            margin: 20px auto;
+            background-color: var(--background-color);
+            border-radius: 15px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Chat Header */
+        .chat-header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Chat Box */
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background-color: var(--background-color);
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        /* Message Styles */
+        .message {
+            display: flex;
+            margin: 10px 0;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background-color: var(--user-message-bg);
+            color: #fff;
+        }
+
+        .message.bot .message-content {
+            background-color: var(--bot-message-bg);
+            color: #333;
+        }
+
+        /* Chat Input Area */
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: #fafafa;
+            border-top: 1px solid #ddd;
+            align-items: center;
+        }
+
+        #query {
+            flex-grow: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #query:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0px 0px 4px var(--primary-color);
+        }
+
+        #send-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #send-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Footer Styles */
+        .footer {
+            padding: 10px;
+            text-align: center;
+            background-color: var(--background-color);
+            font-size: 14px;
+            color: var(--text-color);
+            border-top: 1px solid #ddd;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer a {
+            margin: 0 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            #query {
+                font-size: 14px;
+            }
+
+            #send-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #query {
+                font-size: 12px;
+            }
+
+            #send-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            SupportBot - How can we assist you today?
+        </div>
+
+        <!-- Chat Box -->
+        <div id="chat-box" class="chat-box">
+            <!-- Chat History will be dynamically populated -->
+            {% for message in history %}
+            <div class="message {{ message.sender }}">
+                <div class="message-content">{{ message.message }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input">
+            <input id="query" type="text" placeholder="Type your message here..." autocomplete="off">
+            <button id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Powered by <b>SupportBot</b> | Developed by <a href="https://github.com/" target="_blank">___</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Function to send a message
+        function sendMessage() {
+            const queryInput = document.getElementById("query");
+            const query = queryInput.value.trim();
+
+            if (!query) return;
+
+            appendMessage(query, "user");
+            queryInput.value = "";
+
+            fetch("/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `query=${encodeURIComponent(query)}`
+            })
+            .then(response => response.json())
+            .then(data => appendMessage(data.response, "bot"))
+            .catch(error => {
+                console.error(error);
+                appendMessage("Something went wrong. Please try again.", "bot");
+            });
+        }
+
+        // Function to append a message
+        function appendMessage(message, sender) {
+            const chatBox = document.getElementById("chat-box");
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", sender);
+
+            const contentDiv = document.createElement("div");
+            contentDiv.classList.add("message-content");
+            contentDiv.textContent = message;
+
+            messageDiv.appendChild(contentDiv);
+            chatBox.appendChild(messageDiv);
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Send message on Enter key
+        document.getElementById("query").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>
